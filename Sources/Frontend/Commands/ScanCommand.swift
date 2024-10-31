@@ -119,6 +119,9 @@ struct ScanCommand: FrontendCommand {
 
     @Option(help: "JSON package manifest path (obtained using `swift package describe --type json` or manually)")
     var jsonPackageManifestPath: String?
+    
+    @Option(help: "The target branch to compare against. Use to filter results to only those that are new or changed in the target branch. (Default is non-filter)")
+    var sourceBranch: String?
 
     @Option(help: "Baseline file path used to filter results")
     var baseline: FilePath?
@@ -172,6 +175,7 @@ struct ScanCommand: FrontendCommand {
         configuration.apply(\.$retainCodableProperties, retainCodableProperties)
         configuration.apply(\.$retainEncodableProperties, retainEncodableProperties)
         configuration.apply(\.$jsonPackageManifestPath, jsonPackageManifestPath)
+        configuration.apply(\.$sourceBranch, sourceBranch)
         configuration.apply(\.$baseline, baseline)
         configuration.apply(\.$writeBaseline, writeBaseline)
 

@@ -70,7 +70,13 @@ final class ScanBehavior {
                 baseline = try JSONDecoder().decode(Baseline.self, from: data)
             }
 
-            let filteredResults = try OutputDeclarationFilter().filter(results, with: baseline)
+            let filteredResults = OutputDeclarationFilter(
+                configuration: configuration,
+                baseline: baseline,
+                shell: Shell.shared,
+                logger: logger
+            )
+                .filter(results)
 
             if let baselinePath = configuration.writeBaseline {
                 let usrs = filteredResults

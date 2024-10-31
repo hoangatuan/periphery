@@ -118,6 +118,9 @@ public final class Configuration {
 
     @Setting(key: "json_package_manifest_path", defaultValue: nil)
     public var jsonPackageManifestPath: String?
+    
+    @Setting(key: "source_branch", defaultValue: nil)
+    public var sourceBranch: String?
 
     @Setting(key: "baseline", defaultValue: nil)
     public var baseline: FilePath?

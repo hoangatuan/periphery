@@ -38,6 +38,16 @@ public extension FilePath {
     }
 
     @inlinable
+    func chdir<T>(closure: () throws -> T) rethrows -> T {
+        let previous = Self.current
+        _ = fileManager.changeCurrentDirectoryPath(string)
+        defer {
+            _ = fileManager.changeCurrentDirectoryPath(previous.string)
+        }
+        return try closure()
+    }
+    
+    @inlinable
     func relativeTo(_ relativePath: FilePath) -> FilePath {
         let components = lexicallyNormalized().components.map { $0.string }
         let relativePathComponents = relativePath.lexicallyNormalized().components.map { $0.string }

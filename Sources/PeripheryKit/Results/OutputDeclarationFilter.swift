@@ -5,57 +5,38 @@ import SystemPackage
 
 public final class OutputDeclarationFilter {
     private let configuration: Configuration
+    private let baseline: Baseline?
     private let logger: Logger
-    private let contextualLogger: ContextualLogger
+    private let shell: Shell
+    private let diffProviderFactory: DiffProviderFactoryProtocol.Type
 
-    public required init(configuration: Configuration = .shared, logger: Logger = .init()) {
+    public required init(
+        configuration: Configuration,
+        baseline: Baseline?,
+        shell: Shell,
+        logger: Logger,
+        diffProviderFactory: DiffProviderFactoryProtocol.Type = DiffProviderFactory.self
+    ) {
         self.configuration = configuration
+        self.baseline = baseline
         self.logger = logger
-        self.contextualLogger = logger.contextualized(with: "report:filter")
+        self.shell = shell
+        self.diffProviderFactory = diffProviderFactory
     }
 
-    public func filter(_ declarations: [ScanResult], with baseline: Baseline?) throws -> [ScanResult] {
-        var declarations = declarations
+    public func filter(_ declarations: [ScanResult]) -> [ScanResult] {
+        let diffProviders = diffProviderFactory.makeDiffProvider(
+            configuration: configuration,
+            shell: shell,
+            baseline: baseline,
+            logger: logger
+        )
 
-        if let baseline {
-            var didFilterDeclaration = false
-            declarations = declarations.filter {
-                let isDisjoint = $0.usrs.isDisjoint(with: baseline.usrs)
-                if !isDisjoint {
-                    didFilterDeclaration = true
-                }
-                return isDisjoint
-            }
-
-            if !didFilterDeclaration {
-                logger.warn("No results were filtered by the baseline.")
-            }
+        var filteredDeclarations = declarations
+        for diffProvider in diffProviders {
+            filteredDeclarations = diffProvider.filter(filteredDeclarations)
         }
 
-        if configuration.reportInclude.isEmpty && configuration.reportExclude.isEmpty {
-            return declarations.sorted { $0.declaration < $1.declaration }
-        }
-
-        return declarations
-            .filter { [contextualLogger] in
-                let path = $0.declaration.location.file.path
-
-                if configuration.reportIncludeMatchers.isEmpty {
-                    if configuration.reportExcludeMatchers.anyMatch(filename: path.string) {
-                        contextualLogger.debug("Excluding \(path.string)")
-                        return false
-                    }
-
-                    return true
-                }
-
-                if configuration.reportIncludeMatchers.anyMatch(filename: path.string) {
-                    contextualLogger.debug("Including \(path.string)")
-                    return true
-                }
-
-                return false
-            }
-            .sorted { $0.declaration < $1.declaration }
+        return filteredDeclarations
     }
 }
