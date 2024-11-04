@@ -1,1 +1,1 @@
-let PeripheryVersion = "2.21.0-OKX"
+let PeripheryVersion = "2.22.0-okx"
