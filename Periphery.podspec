@@ -5,6 +5,6 @@ Pod::Spec.new do |spec|
   spec.homepage         = "https://github.com/hoangatuan/periphery"
   spec.license          = { :type => 'MIT', :file => 'LICENSE.md' }
   spec.author           = { "Ian Leitch" => "ian@leitch.io" }
-  spec.source           = { :http => "https://github.com/hoangatuan/periphery/blob/Support-filter-by-source-branch-2/periphery-2.21.2.1.zip" }
+  spec.source           = { :http => "https://github.com/hoangatuan/ios-demos/blob/main/periphery-2.21.2.1.zip" }
   spec.preserve_paths   = '*'
 end
